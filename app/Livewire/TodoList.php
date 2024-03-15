@@ -6,6 +6,7 @@ use App\Models\Todo;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Exception;
 
 class TodoList extends Component
 {
@@ -29,12 +30,20 @@ class TodoList extends Component
 
         $this->reset(['name']);
         request()->session()->flash('success', 'Todo created Successfully!');
+        $this->resetPage();
     }
 
-    public function delete(Todo $todo)
+    public function delete( $todoID)
     {
-        $todo->delete();
-        request()->session()->flash('success', 'Todo deleted Successfully!');
+        try{
+            Todo::findOrfail($todoID)->delete();
+
+        }
+        catch(Exception $e){
+            session()->flash('error', 'Failed to delete todo!');
+            return;
+        }
+
     }
 
     public function toggle(Todo $todo)
